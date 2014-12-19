@@ -1,0 +1,8 @@
+#!/bin/bash
+
+CLASSPATH=".:./javax.json-1.0.3.jar:../google-gson-2.2.4/gson-2.2.4.jar:./object-explorer.jar:./guava-15.0.jar:../jackson/jackson-core-2.2.0.jar:../jackson/jackson-annotations-2.2.0.jar/:../jackson/jackson-databind-2.2.0.jar"
+#java -cp .:../jackson/jackson-core-2.2.0.jar:../jackson/jackson-annotations-2.2.0.jar:../jackson/jackson-databind-2.2.0.jar "$@"
+#java -cp .:../google-gson-2.2.4/gson-2.2.4.jar -Xmx30g $@
+#java -cp .:../google-gson-2.2.4/gson-2.2.4.jar  $@
+echo "java -cp ${CLASSPATH}  $@"
+java -cp ${CLASSPATH}  -Xmx12g $@
