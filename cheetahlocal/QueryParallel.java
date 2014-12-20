@@ -9,7 +9,6 @@ import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonString;
 
-
 public class QueryParallel extends Query implements Runnable { 
 
     //public int type; //0:empty 1:select only 2: select where

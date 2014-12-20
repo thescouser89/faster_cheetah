@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.concurrent.atomic.AtomicInteger;
-
+import java.util.concurrent.locks.*;
 
 public class StoreEngine {
 
@@ -42,6 +42,9 @@ public class StoreEngine {
     /* special character to seprate key and type, use : for now*/ 
     protected String separator=":";
 
+	protected boolean enableCoarseGrainedLock = false;
+	protected boolean enableFineGrainedLock = false;
+	protected Lock coarseLock; 
 
     /**
      * Creates a ring buffer, and using Column format to store the data

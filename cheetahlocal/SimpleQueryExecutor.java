@@ -61,7 +61,7 @@ public class SimpleQueryExecutor {
     //int maxNumQuery = 1000; //max number of queries -- could be more
     //Query [] querySet;
 
-    public SimpleQueryExecutor (String storeMethod, String datafile, int datafile_format) {
+    public SimpleQueryExecutor (String storeMethod, String datafile, int datafile_format, String lockMethod) {
         int buffer_size = 100*1000*1000;
 
         if(storeMethod.equals("ColStoreEng")){
@@ -72,7 +72,7 @@ public class SimpleQueryExecutor {
             store = new NewColStoreEng(buffer_size);
         }else if(storeMethod.equals("NewColStoreEngParallel")) {
             buffer_size = 2 * 1000 * 1000;
-            store = new NewColStoreEngParallel(buffer_size, DEFAULT_NUM_THREADS);
+            store = new NewColStoreEngParallel(buffer_size, DEFAULT_NUM_THREADS, lockMethod);
             useParallel = true;
         }else if(storeMethod.equals("RowStoreEng")){
             buffer_size = 2*1024*1024*1024-4;
@@ -747,6 +747,9 @@ public class SimpleQueryExecutor {
         int datafile_format = 0; // each line is a JSON object
         datafile_format = Integer.valueOf(args[3]); //the whole file is a JSON array
 
+		String lockMethod = "None";
+		if ((args.length >= 4) && ((args[args.length - 1].equals("Coarse")) || (args[args.length - 1].equals("Fine"))))
+			lockMethod = args[args.length - 1];
 
         if(storeMethod.equals("RowStoreEng")){
             System.out.println("RowStoreEng is disabled for this version for now");
@@ -785,7 +788,8 @@ public class SimpleQueryExecutor {
         DEFAULT_NUM_THREADS = input_scanner.nextInt();
         System.out.println();
         System.out.println("Number of threads used: " + DEFAULT_NUM_THREADS);
-        SimpleQueryExecutor engine = new SimpleQueryExecutor(storeMethod, datafile, datafile_format);
+        System.out.println("Lock Level: " + lockMethod);
+        SimpleQueryExecutor engine = new SimpleQueryExecutor(storeMethod, datafile, datafile_format, lockMethod);
 
 
 

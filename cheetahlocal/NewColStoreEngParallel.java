@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.concurrent.locks.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -44,11 +44,14 @@ public class NewColStoreEngParallel extends StoreEngine  {
         int[] objectIds;
         String key;
         String type;
+        
+        boolean enableColLock = false;
+		Lock fineLock;
 
         //----------- Actual tables that store the data in this partition in memory -----------//
         long[] data;
 
-        public ColumnV2(String columnKey, int max_size){
+        public ColumnV2(String columnKey, int max_size, boolean enableLock){
 
             numObject = new AtomicInteger();
 
@@ -70,30 +73,62 @@ public class NewColStoreEngParallel extends StoreEngine  {
             data = new long[max_size];
             key = new String(columnKey);
             objectIds= new int[max_size];
+            
+            enableColLock = enableLock;
+            if (enableColLock)
+    			fineLock = new ReentrantLock(); 
         }
 
         public void saveStrValue(int objid, long pos){
+        
+        	if (enableColLock)
+        		fineLock.lock();
+        
             int numObject = this.numObject.getAndIncrement();
             data[numObject] = pos;
             objectIds[numObject] = objid;
+            
+         	if (enableColLock)
+        		fineLock.unlock();           
+            
             return;
         }
 
         public void saveLongValue(int objid, long longnum){
+        
+         	if (enableColLock)
+        		fineLock.lock();
+        		       
             int numObject = this.numObject.getAndIncrement();
             data[numObject] = longnum;
             objectIds[numObject] = objid;
+            
+            if (enableColLock)
+        		fineLock.unlock();   
+            
             return;
         }
 
         public void saveDoubleValue(int objid, double num){
+        
+          	if (enableColLock)
+        		fineLock.lock();       
+        
             int numObject = this.numObject.getAndIncrement();
             data[numObject] = (long) num * 100000;
             objectIds[numObject] = objid;
+            
+          	if (enableColLock)
+        		fineLock.unlock();              
+            
             return;
         }
 
         public void saveBoolValue(int objid, byte bool){
+        
+          	if (enableColLock)
+        		fineLock.lock();         
+        
             int numObject = this.numObject.getAndIncrement();
             if(bool == (byte)1){
                 data[numObject] = (long) 1;
@@ -101,6 +136,10 @@ public class NewColStoreEngParallel extends StoreEngine  {
                 data[numObject] = (long) 0;
             }
             objectIds[numObject] = objid;
+            
+           	if (enableColLock)
+        		fineLock.unlock();            
+            
             return;
         }
 
@@ -203,7 +242,7 @@ public class NewColStoreEngParallel extends StoreEngine  {
 
     private static final int RESULT_SET_SIZE = 2*1000*1000;
 
-    public NewColStoreEngParallel(int memory_size_in_bytes, int numThreads)
+    public NewColStoreEngParallel(int memory_size_in_bytes, int numThreads, String lockMethod)
     {
         //call parent constructor
         super(memory_size_in_bytes);
@@ -218,28 +257,58 @@ public class NewColStoreEngParallel extends StoreEngine  {
         this.resultSets = new ConcurrentHashMap<Long, ResultSetV2>();
         //setNumberOfThreads(numThreads);//preallocates resultSets
         //this.briefStats = Collections.synchronizedMap( new HashMap<Long, ResultBriefStats>());
+        
+        // select lock policy
+        if (lockMethod.equals("Coarse")) // coarse lock at store level
+        {
+        		enableCoarseGrainedLock = true;
+        		coarseLock = new ReentrantLock(); 
+		}
+		else if (lockMethod.equals("Fine"))	// fine lock at column level
+		{
+        		enableFineGrainedLock = true;
+        }
+        		
     }
 
     /**
      * Navigate the json object and parse it and save it into storage
      */
     public void insertObject(int objid, JsonValue tree, String key){
+		//System.out.println(objid);
+		if (enableCoarseGrainedLock)
+		{
+			
+			coarseLock.lock();	
+			//System.out.println("Lock - " + objid);
+			insertObjectLockProtected(objid, tree, key);
+			//System.out.println("Unlock - " + objid);
+			coarseLock.unlock();
+		}
+		else
+		{
+			insertObjectLockProtected(objid, tree, key);
+		}
+			
+    }
+
+    public void insertObjectLockProtected(int objid, JsonValue tree, String key){
 
         switch(tree.getValueType()){
             case OBJECT:
                 JsonObject object = (JsonObject) tree;
                 for(String name: object.keySet()){
                     if(key!=null)
-                        insertObject(objid,object.get(name),key+"."+name);
+                        insertObjectLockProtected(objid,object.get(name),key+"."+name);
                     else
-                        insertObject(objid,object.get(name),name);
+                        insertObjectLockProtected(objid,object.get(name),name);
                 }
                 break;
             case ARRAY:
                 JsonArray array = (JsonArray) tree;
                 int index =0;
                 for (JsonValue val : array){
-                    insertObject(objid,val,key+"["+index+"]");
+                    insertObjectLockProtected(objid,val,key+"["+index+"]");
                     index += 1;
                 }
                 break;
@@ -277,7 +346,7 @@ public class NewColStoreEngParallel extends StoreEngine  {
             if(key.contains("sparse_")){
                 size = max_buf_size/8/100;
             }
-            cols.put(bufkey, new ColumnV2(bufkey, size));
+            cols.put(bufkey, new ColumnV2(bufkey, size, enableFineGrainedLock));
         }
 
         long position = stringBuffer.position();
@@ -298,7 +367,7 @@ public class NewColStoreEngParallel extends StoreEngine  {
             if(key.contains("sparse_")){
                 size = max_buf_size/8/100;
             }
-            cols.put(bufkey, new ColumnV2(bufkey, size));
+            cols.put(bufkey, new ColumnV2(bufkey, size, enableFineGrainedLock));
         }
 
         cols.get(bufkey).saveLongValue(objid, num);
@@ -316,7 +385,7 @@ public class NewColStoreEngParallel extends StoreEngine  {
             if(key.contains("sparse_")){
                 size = max_buf_size/8/100;
             }
-            cols.put(bufkey, new ColumnV2(bufkey, size));
+            cols.put(bufkey, new ColumnV2(bufkey, size, enableFineGrainedLock));
         }
 
         cols.get(bufkey).saveDoubleValue(objid, num);
@@ -334,7 +403,7 @@ public class NewColStoreEngParallel extends StoreEngine  {
             if(key.contains("sparse_")){
                 size = max_buf_size/8/100;
             }
-            cols.put(bufkey, new ColumnV2(bufkey, size));
+            cols.put(bufkey, new ColumnV2(bufkey, size, enableFineGrainedLock));
         }
 
         if(value.equals("TRUE")==true){

@@ -13,6 +13,8 @@ NewColStoreEng:NewColStoreEng.java
 	${JC} ${JFLAGS} NewColStoreEng.java
 NewRowColStoreEng:NewRowColStoreEng.java
 	${JC} ${JFLAGS} NewRowColStoreEng.java
+NewColStoreEngParallel:NewColStoreEngParallel.java
+	${JC} ${JFLAGS} NewColStoreEngParallel.java	
 SingleQueryAnalyzer:SingleQueryAnalyzer.java
 	${JC} ${JFLAGS} SingleQueryAnalyzer.java
 LayoutFileGenerator:LayoutFileGenerator.java
