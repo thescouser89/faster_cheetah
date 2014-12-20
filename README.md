@@ -63,4 +63,5 @@ the members of the group have worked equally on this project.
 
 ### Presentation Slides
 A pdf of our presentation slides can be found
-[here](https://raw.githubusercontent.com/thescouser89/faster_cheetah/master/Making_Cheetah_Faster_Presentation.pdf "Cheetah Presentation")
+[here](https://raw.githubusercontent.com/thescouser89/faster_cheetah/master/Making_Cheetah_Faster_Presentation.pdf "Cheetah Presentation").
+
