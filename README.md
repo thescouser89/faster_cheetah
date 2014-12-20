@@ -54,3 +54,9 @@ cd cheetahlocal
 make clean; make SimpleQueryExecutor
 ./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/insert_query 1
 ```
+
+### Notice to the reviewers
+Even though the git commit logs might appear that only a single user has
+commited all the work, this repository is just a mirror of the internal
+repository we used throughout the entire semester working on the project. All
+the members of the group have worked equally on this project.
