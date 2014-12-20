@@ -60,3 +60,7 @@ Even though the git commit logs might appear that only a single user has
 commited all the work, this repository is just a mirror of the internal
 repository we used throughout the entire semester working on the project. All
 the members of the group have worked equally on this project.
+
+### Presentation Slides
+A pdf of our presentation slides can be found
+[here](https://raw.githubusercontent.com/thescouser89/faster_cheetah/master/Making_Cheetah_Faster_Presentation.pdf "Cheetah Presentation")
