@@ -2,7 +2,6 @@
 Cheetah is an in-memory database written in Java. The main developer of Cheetah
 is Alan Lu, who is one of the masters students of Professor Amza at the
 University of Toronto.
-
 Our project consists of making the runtime for queries faster by using threads.
 This repository is the code that we modified to achieve this.
 
@@ -52,7 +51,12 @@ performance behaviour for a mix-strategy query.
 ```
 cd cheetahlocal
 make clean; make SimpleQueryExecutor
-./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/insert_query 1
+./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/insert_query_Contention_500 1 CoarseLock
+./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/insert_query_Contention_500 1 FineLock
+./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/workload_50select_50insert 1 FineLock
+./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/workload_50select_50insert 1 FineReadWriteLock
+./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/workload_80select_20insert 1 CoarseReadWriteLock
+./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/workload_80select_20insert 1 FineReadWriteLock
 ```
 
 ### Notice to the reviewers
