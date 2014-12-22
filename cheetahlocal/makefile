@@ -5,7 +5,7 @@
 #JFLAGS = -g
 CLASSPATH = .:./javax.json-1.0.3.jar
 JFLAGS = -Xlint -cp ${CLASSPATH}
-JC = javac
+JC = javac -target 1.6 -source 1.6
 
 NewRowStoreEng:NewRowStoreEng.java
 	${JC} ${JFLAGS} NewRowStoreEng.java

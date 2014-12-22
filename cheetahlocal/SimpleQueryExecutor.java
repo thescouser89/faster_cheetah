@@ -353,7 +353,9 @@ public class SimpleQueryExecutor {
             String insertObject = queryString.split("INSERT")[1].trim();
             query.parameters = new String[1];
 			query.parameters[0] = insertObject;
-			System.out.println("Insert");			
+            /*
+			 * System.out.println("Insert");			
+             */
         }else{
             System.out.println("Unknown query "+queryString);
         }
@@ -748,9 +750,13 @@ public class SimpleQueryExecutor {
         datafile_format = Integer.valueOf(args[3]); //the whole file is a JSON array
 
 		String lockMethod = "None";
-		if ((args.length >= 4) && ((args[args.length - 1].equals("Coarse")) || (args[args.length - 1].equals("Fine"))))
+		if ((args.length >= 4) && 
+			((args[args.length - 1].equals("CoarseLock")) || 
+			 (args[args.length - 1].equals("FineLock")) ||
+			 (args[args.length - 1].equals("CoarseReadWriteLock")) ||
+			 (args[args.length - 1].equals("FineReadWriteLock"))))
 			lockMethod = args[args.length - 1];
-
+			
         if(storeMethod.equals("RowStoreEng")){
             System.out.println("RowStoreEng is disabled for this version for now");
             return;
@@ -813,7 +819,6 @@ public class SimpleQueryExecutor {
 		
         System.out.println("================================");
         System.out.println(end - start);
-        System.out.println("================================");
 
 
         //*******************************************//

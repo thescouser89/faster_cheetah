@@ -163,7 +163,9 @@ public class QueryParallel extends Query implements Runnable {
             String insertObject = queryString.split("INSERT")[1].trim();
             this.parameters = new String[1];
 			this.parameters[0] = insertObject;
-			System.out.println("Insert");	
+            /*
+			 * System.out.println("Insert");	
+             */
         }else{
             System.out.println("Unknown query "+queryString);
         }   

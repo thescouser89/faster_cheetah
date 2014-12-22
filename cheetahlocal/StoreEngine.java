@@ -42,9 +42,9 @@ public class StoreEngine {
     /* special character to seprate key and type, use : for now*/ 
     protected String separator=":";
 
-	protected boolean enableCoarseGrainedLock = false;
-	protected boolean enableFineGrainedLock = false;
+	protected int lockPolicy = 0;
 	protected Lock coarseLock; 
+	protected ReadWriteLock coarseReadWriteLock;
 
     /**
      * Creates a ring buffer, and using Column format to store the data
