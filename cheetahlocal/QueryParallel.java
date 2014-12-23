@@ -308,7 +308,6 @@ public class QueryParallel extends Query implements Runnable {
             this.execute();
             long end = System.currentTimeMillis();
             this.runTime = end - start;
-            //print stuff here?
             
             briefStatsString = store.getBriefStatsString();
             

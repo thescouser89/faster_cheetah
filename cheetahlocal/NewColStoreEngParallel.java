@@ -330,6 +330,7 @@ public class NewColStoreEngParallel extends StoreEngine  {
     int numThreads;
     HashMap<String, ColumnV2> cols;
 
+    //Note: This used to be 100*1000*1000. Changed to 2 million to make it easier to test.
     private static final int RESULT_SET_SIZE = 2*1000*1000;
 
     public NewColStoreEngParallel(int memory_size_in_bytes, int numThreads, String lockMethod)
@@ -345,8 +346,6 @@ public class NewColStoreEngParallel extends StoreEngine  {
         stringBuffer.position(0);
         this.numThreads = numThreads;
         this.resultSets = new ConcurrentHashMap<Long, ResultSetV2>();
-        //setNumberOfThreads(numThreads);//preallocates resultSets
-        //this.briefStats = Collections.synchronizedMap( new HashMap<Long, ResultBriefStats>());
         
         // select lock policy
         if (lockMethod.equalsIgnoreCase("CoarseLock")) // coarse lock at store level
@@ -527,29 +526,10 @@ public class NewColStoreEngParallel extends StoreEngine  {
     public void select(byte[][] columns){
 		lockMe('r');
 	
-        //long tId = Thread.currentThread().getId();
-        //resultSets.get(tId).clearResultSet();
-        //ResultSetV2 result = new ResultSetV2(RESULT_SET_SIZE);//resultSets.get(tId);
 
         long tId = Thread.currentThread().getId();
-        //System.out.println("thread id in select: " + tId);
-        ResultSetV2 result;
-        if( resultSets.containsKey(tId) ){
-            result = resultSets.get(tId);
-            result.clearResultSet();
-        } else {
-            result = addNewResultSet(tId);
-//            synchronized(resultSets){
-//                result = new ResultSetV2(RESULT_SET_SIZE);//resultSets.get(tId);
-//                resultSets.put(tId, result);
-//            }
-        }
-
-
-//        long queryId = Long.parseLong(Thread.currentThread().getName());
-//        ResultSetV2 result = new ResultSetV2(RESULT_SET_SIZE);
-//        resultSets.put(queryId, result);
-        //result.clearResultSet();
+        ResultSetV2 result = resultSets.get(tId);
+        result.clearResultSet();
 
         for(int i = 0; i< columns.length; i++){
             //ByteBuffer selectBuf;
@@ -606,14 +586,6 @@ public class NewColStoreEngParallel extends StoreEngine  {
 ////            }
 //        }
 
-//        try {
-//            result.clearResultSet();
-//        } catch (Exception e) {
-//            System.out.println("result set null probably, thread Id:" + tId);
-//        }
-
-//        ResultSetV2 result = new ResultSetV2(RESULT_SET_SIZE);
-//        resultSets.put(queryId, result);
 
         String where = (new String(whereCol)) + separator + "LONG";
         List<Integer> oidList = cols.get( where ).selectRangeWhereCol(selectCols, value1, value2, result);
@@ -649,12 +621,6 @@ public class NewColStoreEngParallel extends StoreEngine  {
                 cols.get(col).selectCondition(oidList, result);
             }
         }
-
-        //copy enough info for brief stats
-//        long queryId = Long.parseLong(Thread.currentThread().getName());
-//        System.out.println("thread name: " + queryId);
-//        ResultBriefStats toAdd = new ResultBriefStats(result.index, result.oids);
-//        briefStats.put(queryId, toAdd);
 
 		unlockMe('r');
 
@@ -699,44 +665,27 @@ public class NewColStoreEngParallel extends StoreEngine  {
         return;
     }
 
-
+    //function is unused
     public void printBriefStatsByThread() {
         long queryId = Long.parseLong(Thread.currentThread().getName());
     //    resultSets.get(queryId).printBriefStats();
     }
 
+    //function is unused
     public void setNumberOfThreads(int numThreads) {
         for( long i = 0; i < numThreads; i++ ){
     //        resultSets.put(i, new ResultSetV2(RESULT_SET_SIZE) );
         }
     }
 
-//    public void printBriefStatsForQuery( long queryId ) {
-//        briefStats.get(queryId).printBriefStats();
-//        briefStats.remove(queryId);
-//    }
-//
-//    public ResultBriefStats getBriefStatsForQuery( long queryId ) {
-//        ResultBriefStats rbs = briefStats.get(queryId);
-//        briefStats.remove(queryId);
-//        return rbs;
-//    }
 
     public String getBriefStatsString() {
         long queryId = Long.parseLong(Thread.currentThread().getName());
         long tId = Thread.currentThread().getId();
         String toReturn = resultSets.get(tId).makeBriefStatsString();
-        //String toReturn = briefStats.get(queryId).makeBriefStatsString();
-        //briefStats.remove(queryId);
         return toReturn;
     }
 
-
-//    public ResultSetV2 getResultSetForQueryId( long queryId ){
-//        ResultSetV2 rs = resultSets.get(queryId);
-//        resultSets.remove(queryId);
-//        return rs;
-//    }
 
     public ResultSetV2 addNewResultSet(long tId ){
         System.out.println("== Creating resultsetv2");

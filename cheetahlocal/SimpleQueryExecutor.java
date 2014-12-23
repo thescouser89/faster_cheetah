@@ -249,7 +249,7 @@ public class SimpleQueryExecutor {
 
     /* parse simplified SQL query: one table no nested query */
     /* later: parse real sql query using existing library*/
-    //GARY this is now for sequential only.
+    //This is now for sequential only.
     //Same function copied to QueryParallel
     public Query parse(String queryString)
     {
@@ -394,7 +394,7 @@ public class SimpleQueryExecutor {
         String results = "";
 
 // *****************************************************************************
-//   This code lies. We don't want to select all the columns. Only the ones
+//   We don't want to select all the columns. Only the ones
 //   that are only specified in the query object.
 // *****************************************************************************
 //        //added by Alan to test SELECT all sparse fields
@@ -608,14 +608,12 @@ public class SimpleQueryExecutor {
 //        QueryParallel.setPrinterQueue(printerQueue);
 //        printerQueue.start();
 
-        //System.out.println("Done initializing?");
         try{
             BufferedReader bufferedReader = new BufferedReader(new FileReader(queryfile));
             String line = bufferedReader.readLine();
             int queryId = 0;
             //Query query;
             while (line !=null){
-                //p(line);
                 if(line.startsWith("#")==false){
                     QueryParallel query = new QueryParallel(queryId, this.store, line);
                     queries.add(queryId, query);
@@ -639,7 +637,6 @@ public class SimpleQueryExecutor {
             System.out.println("InterruptedException for awaitTermination: " + e.getMessage());
         }
 
-        //parallelize this? or put in query.run()?
         //aggregates runtimes in hashtable and prints summary for each query
         for( QueryParallel query : queries ) {
             if( query.type > 0 ) {
@@ -656,14 +653,11 @@ public class SimpleQueryExecutor {
 					String[] temp3 = queryfile.split("\\/");
 					System.out.print(temp3[temp3.length - 1] + "_selectivity:" + sel + "%;" + storeMethod);
 
-					//System.out.print(splitQueryFile[splitQueryFile.length - 1] + "_selectivity:" + sel + "%;" + storeMethod);
 					System.out.print(";");
 					query.printBriefStatsString();
-					//query.printBriefStats();
 					System.out.print(";" + query.getRunTime());
 
 					System.out.println("");
-					//printSummary(queryfile,queryString,query.getRunTime());//put in query.run()?
 					System.out.println();
 				}
             }
@@ -822,7 +816,7 @@ public class SimpleQueryExecutor {
 
 
         //*******************************************//
-        // Anything below here is stuff Alan had     //
+        // Anything below here is stuff Alan Lu had     //
         //*******************************************//
 
         //long end = System.currentTimeMillis();

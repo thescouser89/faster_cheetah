@@ -47,7 +47,7 @@ function benchmark() {
 benchmark "dense coarse lock" "./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/insert_query_Contention_500 1 CoarseLock"
 benchmark "dense fine lock" "./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/insert_query_Contention_500 1 FineLock"
 
-benchmark "mixed coarse lock" "./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/workload_50select_50insert 1 FineLock"
+benchmark "mixed fine-grained simple lock" "./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/workload_50select_50insert 1 FineLock"
 benchmark "mixed fine lock" "./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/workload_50select_50insert 1 FineReadWriteLock"
 
 benchmark "mixed with 80% select coarse lock" "./run SimpleQueryExecutor NewColStoreEngParallel ./Sample_Input_Files/nobench_data.json ./Sample_Input_Files/workload_80select_20insert 1 CoarseReadWriteLock"
