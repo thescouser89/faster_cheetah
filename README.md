@@ -1,9 +1,16 @@
 # Cheetah
 Cheetah is an in-memory database written in Java. The main developer of Cheetah
-is Alan Lu, who is one of the masters students of Professor Amza at the
+is Alan Lu, who is one of the masters students of Professor Cristiana Amza at the
 University of Toronto.
 Our project consists of making the runtime for queries faster by using threads.
 This repository is the code that we modified to achieve this.
+
+Modifications are in cheetahlocal. No changes have been done to cheetahlocalOld.
+
+ECE1747 group:
+Gary Chaw
+Dustin Kut Moy Cheung
+Alan Ng
 
 # How to run
 ### ColStore
