@@ -8,9 +8,7 @@ This repository is the code that we modified to achieve this.
 Modifications are in cheetahlocal. No changes have been done to cheetahlocalOld.
 
 ECE1747 group:
-Gary Chaw
-Dustin Kut Moy Cheung
-Alan Ng
+Gary Chaw, Dustin Kut Moy Cheung, Alan Ng
 
 # How to run
 ### ColStore
